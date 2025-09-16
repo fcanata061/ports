@@ -1,0 +1,153 @@
+Roteiro de Implementação do Gerenciador de Ports (PSB)
+
+Este roteiro serve como guia para a implementação gradual da lógica do gerenciador, baseado no esqueleto completo que já foi criado.
+
+
+---
+
+1. Preparação e Estrutura de Diretórios
+
+Certificar que os diretórios padrão existam: $REPO, $SRC, $PKG, $BIN, $LOG, $DESTDIR.
+
+Criar subdiretórios dentro de $REPO: core, extra, x11, desktop.
+
+Garantir permissões corretas para escrita e leitura dos diretórios.
+
+
+2. Logging
+
+Implementar prepare_log e LOG_FILE funcional.
+
+Garantir cores no console e logs limpos em arquivos.
+
+Integrar spinner a todos os comandos longos (run_cmd).
+
+
+3. Parser de Receitas
+
+Implementar load_recipe completamente para carregar todas as variáveis do arquivo recipe.
+
+Definir variáveis obrigatórias: NAME, VERSION, BUILD_SYSTEM, SOURCES, SHA256S, BUILD_DEPS, RUN_DEPS, PATCHES, HOOKS.
+
+
+4. Hooks
+
+Implementar hooks pré e pós etapas:
+
+HOOK_PRE_FETCH, HOOK_POST_FETCH
+
+HOOK_PRE_BUILD, HOOK_POST_BUILD
+
+HOOK_PRE_INSTALL, HOOK_POST_INSTALL
+
+HOOK_PRE_CLEAN, HOOK_POST_CLEAN
+
+HOOK_PRE_PACKAGE, HOOK_POST_PACKAGE
+
+
+Garantir que cada função principal chama seus hooks correspondentes.
+
+
+5. SHA256 / Verificação de Fontes
+
+Implementar check_sha256 para verificar arquivos individuais.
+
+Implementar verify_sources para checar todas as fontes listadas em SOURCES e SHA256S.
+
+Integrar verificação após download/extract.
+
+
+6. Dependências
+
+Implementar check_build_deps e install_build_deps.
+
+Implementar check_run_deps e install_run_deps.
+
+Integrar verificação de deps no build() e install_pkg().
+
+
+7. Handlers por BUILD_SYSTEM
+
+Para cada BUILD_SYSTEM (autotools, meson, cmake, cargo, wheel, make, custom, meta):
+
+Implementar build, install, package, clean.
+
+Garantir compatibilidade com hooks e logging.
+
+
+
+8. Funções Principais
+
+fetch() → download de fontes via HTTPS/Git.
+
+extract() → suporte a todos os formatos (tar.gz, tar.xz, zip, etc.).
+
+build() → invoca build handler correto, integra deps, hooks e logging.
+
+install_pkg() → instala binários ou diretórios, integra deps de runtime.
+
+package() → empacota resultado em tar.xz, gera manifesto, aplica strip se necessário.
+
+clean() → remove diretórios temporários e cache, integra hooks e spinner.
+
+
+9. Funções Auxiliares
+
+upgrade() → placeholder para atualizar todos os pacotes instalados.
+
+revdep() → verificar dependências reversas.
+
+search() → buscar pacotes disponíveis e instalados.
+
+info() → mostrar informações completas de um pacote.
+
+remove_pkg() → remover pacotes do sistema, integrando deps.
+
+
+10. System Rebuild
+
+Percorrer $REPO (categorias e pacotes) respeitando dependências de build (placeholder inicialmente).
+
+Ciclo completo: fetch → extract → build → install → package.
+
+Hooks pré/pós build de sistema.
+
+Logging por pacote.
+
+
+11. CLI / Parser de Ações
+
+Ações principais: fetch, extract, build (b), install (i), package (p), clean, manifest, search (s), info, upgrade (u), revdep, remove.
+
+Garantir parsing correto de argumentos e abreviações.
+
+
+12. Próximos Passos de Implementação Real
+
+1. Implementar download real (wget, curl, git clone) em fetch().
+
+
+2. Implementar extração real para todos os formatos em extract().
+
+
+3. Implementar build real de cada BUILD_SYSTEM.
+
+
+4. Implementar instalação real (DESTDIR, binários, libs, docs) em install_pkg().
+
+
+5. Implementar empacotamento real em package() com strip e manifesto.
+
+
+6. Implementar resolução real de dependências (ordem de build) para system_rebuild().
+
+
+7. Testes unitários de cada função e integração completa.
+
+
+
+
+---
+
+✅ Conclusão: O roteiro organiza claramente onde cada parte do gerenciador está (esqueleto), e aponta a sequência lógica para implementar a funcionalidade real de cada etapa, mantendo consistência com o projeto original.
+
