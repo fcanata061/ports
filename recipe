@@ -1,0 +1,57 @@
+# Informações básicas do pacote
+NAME="example"
+VERSION="1.0"
+SUMMARY="Pacote de exemplo completo para teste do gerenciador"
+HOMEPAGE="https://example.org"
+LICENSE="MIT"
+
+# Sistema de build suportado: autotools, meson, cmake, cargo, wheel, make, custom, meta
+BUILD_SYSTEM="autotools"
+
+# Fontes do pacote
+SOURCES=(
+    "https://example.org/downloads/example-1.0.tar.gz"
+    "https://github.com/example/example.git+git#main"
+)
+
+SHA256S=(
+    "abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc1"
+    ""  # Git repos não precisam de SHA256
+)
+
+# Dependências de build
+BUILD_DEPS=(
+    "autoconf"
+    "automake"
+    "libtool"
+)
+
+# Dependências de runtime
+RUN_DEPS=(
+    "glibc"
+    "libffi"
+)
+
+# Patches a aplicar
+PATCHES=(
+    "fix-compile.patch"
+    "add-feature.patch"
+)
+
+# Argumentos de configuração (exemplo autotools)
+CONFIGURE_ARGS=(
+    "--prefix=/usr"
+    "--enable-feature-x"
+)
+
+# Hooks pré e pós etapas (esqueleto)
+HOOK_PRE_FETCH="echo 'Hook pré-fetch executado'"
+HOOK_POST_FETCH="echo 'Hook pós-fetch executado'"
+HOOK_PRE_BUILD="echo 'Hook pré-build executado'"
+HOOK_POST_BUILD="echo 'Hook pós-build executado'"
+HOOK_PRE_INSTALL="echo 'Hook pré-install executado'"
+HOOK_POST_INSTALL="echo 'Hook pós-install executado'"
+HOOK_PRE_CLEAN="echo 'Hook pré-clean executado'"
+HOOK_POST_CLEAN="echo 'Hook pós-clean executado'"
+HOOK_PRE_PACKAGE="echo 'Hook pré-package executado'"
+HOOK_POST_PACKAGE="echo 'Hook pós-package executado'"
