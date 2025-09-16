@@ -1,0 +1,161 @@
+\==============================
+Gerenciador de Ports (PSB) - Manual Completo
+============================================
+
+Este arquivo serve como tutorial completo do gerenciador de ports, incluindo estrutura, comandos, receitas e funcionamento.
+
+---
+
+1. Estrutura de Diretórios do Ports
+
+---
+
+/var/ports/            # Diretório base de trabalho
+├── src/               # Fontes baixadas e extraídas
+├── pkg/               # Pacotes construídos
+├── bin/               # Binários locais
+├── log/               # Logs de compilação
+\$REPO                  # Diretório contendo as receitas
+├── core/              # Pacotes essenciais
+│   ├── gcc-12.2/
+│   │   └── recipe
+│   └── example-1.0/
+│       └── recipe
+├── extra/             # Pacotes extras
+├── x11/               # Pacotes de X11
+└── desktop/           # Pacotes GUI
+
+---
+
+2. Estrutura de uma receita
+
+---
+
+Cada receita (arquivo recipe) contém:
+
+* NAME: Nome do pacote
+* VERSION: Versão
+* SUMMARY: Resumo do pacote
+* HOMEPAGE: Homepage
+* LICENSE: Licença
+* BUILD\_SYSTEM: autotools, meson, cmake, cargo, wheel, make, custom, meta
+* SOURCES: URLs de tarballs ou Git (usar +git#branch para Git)
+* SHA256S: SHA256 dos tarballs (vazio para Git)
+* BUILD\_DEPS: Dependências de build
+* RUN\_DEPS: Dependências de runtime
+* PATCHES: Patches a aplicar
+* CONFIGURE\_ARGS: Argumentos de configuração
+* HOOKS: pré e pós fetch/build/install/clean/package
+
+Exemplo de SOURCES com Git:
+SOURCES=(
+"[https://example.org/downloads/example-1.0.tar.gz](https://example.org/downloads/example-1.0.tar.gz)"
+"[https://github.com/example/example.git+git#main](https://github.com/example/example.git+git#main)"
+)
+SHA256S=(
+"abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abc1"
+""
+)
+
+---
+
+3. Comandos Principais do Gerenciador
+
+---
+
+fetch <pacote>     # Baixa fontes do pacote
+extract <pacote>   # Extrai fontes em \$SRC/<pacote>
+build | b <pacote> # Compila o pacote (respeita dependências de build)
+install | i <pacote> # Instala o pacote (respeita dependências de runtime)
+package | p <pacote> # Empacota o pacote
+clean <pacote>      # Limpa diretórios temporários do pacote
+manifest <pacote>   # Gera manifesto (placeholder)
+search | s <termo>  # Busca pacotes disponíveis/instalados
+info <pacote>       # Mostra informações do pacote
+upgrade | u         # Atualiza todos pacotes instalados (placeholder)
+revdep <pacote>     # Verifica dependências reversas (placeholder)
+remove <pacote>     # Remove pacote do sistema
+system\_rebuild      # Recompila todos os pacotes do sistema
+
+---
+
+4. Hooks
+
+---
+
+Hooks pré e pós etapas podem ser definidos na receita:
+
+* HOOK\_PRE\_FETCH / HOOK\_POST\_FETCH
+* HOOK\_PRE\_BUILD / HOOK\_POST\_BUILD
+* HOOK\_PRE\_INSTALL / HOOK\_POST\_INSTALL
+* HOOK\_PRE\_CLEAN / HOOK\_POST\_CLEAN
+* HOOK\_PRE\_PACKAGE / HOOK\_POST\_PACKAGE
+
+Exemplo:
+HOOK\_PRE\_BUILD="echo 'Pré-build executado'"
+HOOK\_POST\_INSTALL="echo 'Pós-install executado'"
+
+---
+
+5. Dependências
+
+---
+
+BUILD\_DEPS: dependências necessárias apenas para compilar o pacote.
+RUN\_DEPS: dependências necessárias para rodar o pacote.
+O gerenciador verifica e instala dependências automaticamente (placeholders no esqueleto).
+
+---
+
+6. SHA256 e Verificação de Fontes
+
+---
+
+* check\_sha256(file, expected): checa se o SHA256 do arquivo confere.
+* verify\_sources(): percorre todos os SOURCES e valida com SHA256S.
+* Git não precisa de SHA256, apenas tarballs.
+
+---
+
+7. Fluxo de Construção de um Pacote
+
+---
+
+1. fetch: baixa as fontes (tarballs ou Git)
+2. extract: extrai os tarballs em \$SRC/<pacote>
+3. hooks pré-build
+4. check\_build\_deps + install\_build\_deps
+5. build: executa o BUILD\_SYSTEM definido
+6. hooks pós-build
+7. install\_pkg: instala binários/diretórios
+8. hooks pós-install
+9. package: empacota resultado
+10. clean: opcional para remover temporários
+
+---
+
+8. System Rebuild
+
+---
+
+* Percorre todas as categorias e pacotes dentro do \$REPO
+* Respeita dependências de build (placeholders)
+* Ciclo completo: fetch → extract → build → install → package
+* Hooks pré e pós build de sistema
+* Logs separados por pacote em \$LOG/<pacote>/<pacote>.log
+
+---
+
+9. Observações Gerais
+
+---
+
+* Combinam-se fontes Git e tarballs na mesma receita.
+* Branch/tag do Git indicado com #branch no final da URL +git.
+* Todos os logs são coloridos e gravados em tempo real em \$LOG.
+* Spinner visual acompanha comandos longos.
+* Arquitetura modular: cada BUILD\_SYSTEM, hook e dependência pode ser implementada detalhadamente.
+
+\==============================
+Fim do Manual
+=============
