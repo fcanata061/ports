@@ -47,10 +47,6 @@ Ações disponíveis:
   system-rebuild - recompilar o sistema inteiro
   remove (r)   - remover pacote
   help (h)     - mostrar esta ajuda
-
-Opções:
-  --force      - forçar ação
-  --strip      - remover símbolos após build
 EOF
     exit 0
 }
@@ -79,61 +75,115 @@ load_recipe() {
     CONFIGURE_ARGS="" PATCHES="" STRIP="" PKG_FORMAT=""
     HOOK_PRE_FETCH="" HOOK_PRE_BUILD="" HOOK_POST_BUILD="" HOOK_INSTALL=""
 
-    # Carregar receita
     . "$recipe"
 
-    log_info "Receita carregada: $NAME $VERSION"
+    log_info "Receita carregada: $NAME $VERSION (build=$BUILD_SYSTEM)"
 }
 
 ### -------------------------
-### Funções principais (esqueleto)
+### Handlers por BUILD_SYSTEM (esqueleto)
+### -------------------------
+
+build_autotools() {
+    log_info "[autotools] Configurando e compilando $NAME"
+    # TODO: ./configure && make
+}
+
+build_meson() {
+    log_info "[meson] Configurando e compilando $NAME"
+    # TODO: meson setup build && ninja -C build
+}
+
+build_cmake() {
+    log_info "[cmake] Configurando e compilando $NAME"
+    # TODO: cmake -B build -S . && cmake --build build
+}
+
+build_cargo() {
+    log_info "[cargo] Compilando $NAME"
+    # TODO: cargo build --release
+}
+
+build_wheel() {
+    log_info "[python/wheel] Compilando $NAME"
+    # TODO: python3 -m build
+}
+
+build_make() {
+    log_info "[make] Compilando $NAME"
+    # TODO: make
+}
+
+build_custom() {
+    log_info "[custom] Executando hooks customizados de $NAME"
+    # TODO: rodar HOOK_PRE_BUILD, HOOK_POST_BUILD
+}
+
+build_meta() {
+    log_info "[meta] Nenhum build, apenas dependências de $NAME"
+    # TODO: só registrar como instalado
+}
+
+### -------------------------
+### Funções principais
 ### -------------------------
 
 fetch() {
     load_recipe "$1"
     log_info "Baixando fonte de $NAME-$VERSION"
-    # TODO: implementar download (git, https, etc.)
+    # TODO: download (https, git, etc.)
 }
 
 extract() {
     load_recipe "$1"
     log_info "Extraindo fonte de $NAME-$VERSION"
-    # TODO: implementar extração em $SRC
+    # TODO: extrair no $SRC
 }
 
 build() {
     load_recipe "$1"
-    log_info "Compilando $NAME-$VERSION"
-    # TODO: ler BUILD_SYSTEM e chamar rotina correta
+    log_info "Iniciando compilação de $NAME-$VERSION"
+
+    case "$BUILD_SYSTEM" in
+        autotools) build_autotools ;;
+        meson)     build_meson ;;
+        cmake)     build_cmake ;;
+        cargo)     build_cargo ;;
+        wheel|python) build_wheel ;;
+        make)      build_make ;;
+        custom)    build_custom ;;
+        meta)      build_meta ;;
+        *) log_error "Sistema de build desconhecido: $BUILD_SYSTEM"; exit 1 ;;
+    esac
 }
 
 install_pkg() {
     load_recipe "$1"
     log_info "Instalando $NAME-$VERSION"
-    # TODO: copiar arquivos de $DESTDIR para /
+    # TODO: copiar arquivos para /
 }
 
 package() {
     load_recipe "$1"
     log_info "Empacotando $NAME-$VERSION"
-    # TODO: criar tar.xz do DESTDIR
+    # TODO: gerar tar.xz
 }
 
 clean() {
     load_recipe "$1"
     log_info "Limpando diretórios temporários de $NAME-$VERSION"
-    # TODO: remover /tmp/$NAME e lixo de build
+    # TODO
 }
 
 manifest() {
     load_recipe "$1"
     log_info "Gerando manifesto de $NAME-$VERSION"
-    # TODO: listar arquivos e dependências
+    # TODO
 }
 
 search() {
     log_info "Procurando por $1"
-    # TODO: buscar em $REPO e DB de pacotes
+    # TODO
 }
 
 info() {
